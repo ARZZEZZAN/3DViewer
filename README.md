@@ -168,11 +168,11 @@ where _a_ and _b_ are the scaling factors for the OX and OY axes respectively. O
 ## Chapter III
 
 ## Part 1. 3DViewer
-You need to develop a program to visualise 3D wireframe models.
+You need to develop a program to visualise 3D wireframe models:
 
 - The program must be developed in C language of C11 standard using gcc compiler
 - The program code must be located in the src folder
-- The program must be built with Makefile which contains standard set of targets for GNU-programs: all, install, uninstall, clean, distclean, mostyclean, realclean, TAGS, info, dvi, dist. The installation directory must be /opt/3dviewer/v1.0
+- The program must be built with Makefile which contains standard set of targets for GNU-programs: all, install, uninstall, clean, dvi, dist, tests, gcov. Installation directory could be arbitrary, except the building one
 - The program must be developed according to the principles of structured programming
 - Prepare full coverage of modules related to model loading and affine transformations with unit-tests
 - There should only be one model on the screen at a time
