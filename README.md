@@ -19,6 +19,10 @@ The russian version of the task can be found in the repository.
 
 ## Preamble
 
+![3DViewer](misc/images/3dviewer.png)
+
+Somewhere near the water cooler in '90:
+
 *-- We can't make a cartoon about animals.*
 
 *- Why the hell not? John, your Tin Toy has made a splash! Imagine what will happen when the world sees something like 101 Dalmatians in 3d!*
