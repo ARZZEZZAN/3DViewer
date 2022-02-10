@@ -6,6 +6,7 @@ The russian version of the task can be found in the repository.
 
 
 ## Contents
+
 0. [Preamble](#preamble)
 1. [Chapter I](#chapter-i) \
    1.1. [Introduction](#introduction)
@@ -172,9 +173,10 @@ where _a_ and _b_ are the scaling factors for the OX and OY axes respectively. O
 ## Chapter III
 
 ## Part 1. 3DViewer
+
 You need to develop a program to visualise 3D wireframe models:
 
-- The program must be developed in C language of C11 standard using gcc compiler
+- The program must be developed in C language of C11 standard using gcc compiler. You can use any additional QT libraries and modules
 - The program code must be located in the src folder
 - The program must be built with Makefile which contains standard set of targets for GNU-programs: all, install, uninstall, clean, dvi, dist, tests, gcov. Installation directory could be arbitrary, except the building one
 - The program must be developed according to the principles of structured programming
