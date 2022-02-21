@@ -42,7 +42,7 @@ You realised that Lasseter's arguments were too convincing and there was no poin
 
 *- Sounds interesting!*
 
-*-- It is. You should go to your team asap and start developing 3d modelling software. If we want to make this cartoon, we need our own software tools. The ones that on the market will only allow to animate a wooden pyramid, and even then in the form of a cube.*
+*-- It is. You should go to your team asap and start developing 3d modelling software. If we want to make this cartoon, we need our own software tools. The ones that on the market will only allow us to animate a wooden pyramid, and even then in the form of a cube.*
 
 *- Okay, but first, we need to do the most important thing - the preview screen.*
 
@@ -198,13 +198,13 @@ You need to develop a program to visualise 3D wireframe models:
 
 ## Part 2. Bonus. Settings
 
-- The program should allow to customize the type of projection (parallel and central)
-- The program should allow to set up the type (solid, dashed), color and thickness of the edges, display method (none, circle, square), color and size of the vertices
-- The program should allow you to choose the background color
+- The program should allow customizing the type of projection (parallel and central)
+- The program should allow setting up the type (solid, dashed), color and thickness of the edges, display method (none, circle, square), color and size of the vertices
+- The program should allow choosing the background color
 - Settings should be saved between program restarts
 
 ## Part 3. Bonus. Record
 
-- The program must allow to save the captured (rendered) images as bmp and jpeg files.
-- The program must allow to record small screencasts by a special button - the current custom affine transformation of the loaded object into gif-animation (640x480, 10fps, 5s)
+- The program must allow saving the captured (rendered) images as bmp and jpeg files.
+- The program must allow recording small screencasts by a special button - the current custom affine transformation of the loaded object into gif-animation (640x480, 10fps, 5s)
 
