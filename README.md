@@ -1,5 +1,8 @@
 # 3DViewer v1.0
 
+> При старте работы над проектом просим вас постараться хронометрировать время работы над проектом.
+> По завершении работы над проектом просим вас ответить на два вопроса [в этом опросе](https://forms.gle/51aADrXJGHYH9jEi6)
+
 Implementation of 3DViewer v1.0.
 
 The russian version of the task can be found in the repository.
@@ -181,7 +184,7 @@ You need to develop a program to visualise 3D wireframe models:
 - The program must be built with Makefile which contains standard set of targets for GNU-programs: all, install, uninstall, clean, dvi, dist, tests, gcov. Installation directory could be arbitrary, except the building one
 - The program must be developed according to the principles of structured programming
 - Prepare full coverage of modules related to model loading and affine transformations with unit-tests
-- There should only be one model on the screen at a time
+- There should be only one model on the screen at a time
 - The program must provide the ability to:
     - Load a wireframe model from an obj file (vertices and surfaces list support only).
     - Translate the model by a given distance in relation to the X, Y, Z axes.
@@ -198,10 +201,10 @@ You need to develop a program to visualise 3D wireframe models:
 
 ## Part 2. Bonus. Settings
 
-- The program should allow customizing the type of projection (parallel and central)
-- The program should allow setting up the type (solid, dashed), color and thickness of the edges, display method (none, circle, square), color and size of the vertices
-- The program should allow choosing the background color
-- Settings should be saved between program restarts
+- The program must allow customizing the type of projection (parallel and central)
+- The program must allow setting up the type (solid, dashed), color and thickness of the edges, display method (none, circle, square), color and size of the vertices
+- The program must allow choosing the background color
+- Settings must be saved between program restarts
 
 ## Part 3. Bonus. Record
 
