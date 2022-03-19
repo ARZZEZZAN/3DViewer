@@ -188,7 +188,7 @@ You need to develop a program to visualise 3D wireframe models:
 - The program must provide the ability to:
     - Load a wireframe model from an obj file (vertices and surfaces list support only).
     - Translate the model by a given distance in relation to the X, Y, Z axes.
-    - Rotate the model by a given angle relative to the X, Y, Z axes.
+    - Rotate the model by a given angle relative to its X, Y, Z axes.
     - Scale the model by a given value.
 - GUI implementation, based on any GUI library with API for C89/C99/C11 (GTK+, Nuklear, raygui, microui, libagar, libui, IUP, LCUI, CEF, Qt, etc.)
 - The graphical user interface must contain:
