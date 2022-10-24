@@ -201,6 +201,8 @@ You need to develop a program to visualise 3D wireframe models:
     - Information about the uploaded model - file name, number of vertices and edges.
 - The program must correctly processes and allows user to view models with details up to 100, 1000, 10,000, 100,000, 1,000,000  vertices without freezing (a freeze is an interface inactivity of more than 0.5 seconds)
 
+*Note:* **Don't upload heavy files (>10 mb) to git.**
+
 ## Part 2. Bonus. Settings
 
 - The program must allow customizing the type of projection (parallel and central)
