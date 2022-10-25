@@ -215,3 +215,5 @@ You need to develop a program to visualise 3D wireframe models:
 - The program must allow saving the captured (rendered) images as bmp and jpeg files.
 - The program must allow recording small screencasts by a special button - the current custom affine transformation of the loaded object into gif-animation (640x480, 10fps, 5s)
 
+
+💡 [Tap here](https://forms.yandex.ru/u/6357da1ac417f331abfd416c/) **to leave your feedback on the project.** Pedago Team really tries to make your educational experience better.
