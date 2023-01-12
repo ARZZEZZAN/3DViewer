@@ -1,14 +1,4 @@
 #include "s21_3DViewer_v1.h"
-#define size 1024
-int parsingData(data_t *data, matrix_t *matrix, char *model_file_name);
-int parsingDataSize(data_t *data, char *model_file_name);
-int parsingСonditions(char c, char *string_file, int *step);
-int s21_is_space(char c);
-int s21_skip_space(char *str, int *step);
-int s21_string_to_double(char *str, int *step, double *number);
-int s21_create_matrix(int rows, int columns, matrix_t *result);
-int s21_is_digit(char c);
-void printf_matrix(matrix_t matrix);
 
 int main() {
   data_t data = {0};
@@ -23,17 +13,10 @@ int main() {
   printf("count_of_vertexes = %d\n", data.count_of_vertexes);
   printf("count_of_facets = %d\n", data.count_of_facets);
   printf_matrix(matrix);
+  s21_remove_matrix(&matrix);
   return 0;
 }
 
-void printf_matrix(matrix_t matrix) {
-  for (int i = 0; i < matrix.rows; i++) {
-    for (int j = 0; j < matrix.cols; j++) {
-      printf("%lf ", matrix.matrix[i][j]);
-    }
-    printf("\n");
-  }
-}
 int parsingData(data_t *data, matrix_t *matrix, char *model_file_name) {
   int flag = 1;
   char string_file[size] = {'\0'};
@@ -66,6 +49,80 @@ int parsingData(data_t *data, matrix_t *matrix, char *model_file_name) {
     flag = 0;
   }
   return flag;
+}
+
+/// @brief Парсинг количества вершин и полигонов
+/// @param data структура данных
+/// @param model_file_name наименование файла модели
+/// @return 1 - ok 0 - error
+int parsingDataSize(data_t *data, char *model_file_name) {
+  int flag = 1;
+  FILE *f;
+  char string_file[size] = {'\0'};
+  if ((f = fopen(model_file_name, "r")) != NULL) {
+    while (fgets(string_file, size, f)) {
+      if (parsingСonditions('v', string_file, NULL)) {
+        data->count_of_vertexes++;
+      } else if (parsingСonditions('f', string_file, NULL)) {
+        data->count_of_facets++;
+      }
+      string_file[0] = 0;
+    }
+  } else {
+    flag = 0;
+  }
+  return flag;
+}
+
+/// @brief Соответсвие условиям парсинга
+/// @param c тип данных obj файла
+/// @param string_file строка obj файла
+/// @return 1 - ok 0 - error
+int parsingСonditions(char c, char *string_file, int *step) {
+  int flag = 0;
+  int s = 0;
+  s21_skip_space(string_file, &s);
+  if (string_file[s] == c) {
+    if (string_file[s + 1] == ' ') {
+      flag = 1;
+    }
+  }
+  step ? *step = s + 2 : 0;
+  return flag;
+}
+
+/// @brief Создание матриц
+/// @param rows
+/// @param columns
+/// @param result
+/// @return 0 - OK 1 - Ошибка, некорректная матрица
+int s21_create_matrix(int rows, int columns, matrix_t *result) {
+  int res = 1;
+  if (rows > 0 && columns > 0) {
+    double **matrix =
+        calloc(rows * columns * sizeof(double) + rows * sizeof(double *), 1);
+
+    if (matrix != NULL) {
+      double *ptr = (double *)(matrix + rows);
+      for (int i = 0; i < rows; i += 1) {
+        matrix[i] = ptr + columns * i;
+      }
+      result->matrix = matrix;
+      result->cols = columns;
+      result->rows = rows;
+      res = 0;
+    }
+  }
+  return res;
+}
+
+/// @brief Обнуление матриц
+/// @param A
+void s21_remove_matrix(matrix_t *A) {
+  if (A->matrix) free(A->matrix);
+  A->matrix = NULL;
+  A->cols = 0;
+  A->rows = 0;
 }
 
 /// @brief Перевод из строки в double
@@ -124,71 +181,6 @@ int s21_is_digit(char c) {
   return flag;
 }
 
-/// @brief Создание матриц
-/// @param rows
-/// @param columns
-/// @param result
-/// @return 0 - OK 1 - Ошибка, некорректная матрица
-int s21_create_matrix(int rows, int columns, matrix_t *result) {
-  int res = 1;
-  if (rows > 0 && columns > 0) {
-    double **matrix =
-        calloc(rows * columns * sizeof(double) + rows * sizeof(double *), 1);
-
-    if (matrix != NULL) {
-      double *ptr = (double *)(matrix + rows);
-      for (int i = 0; i < rows; i += 1) {
-        matrix[i] = ptr + columns * i;
-      }
-      result->matrix = matrix;
-      result->cols = columns;
-      result->rows = rows;
-      res = 0;
-    }
-  }
-  return res;
-}
-
-/// @brief Парсинг количества вершин и полигонов
-/// @param data структура данных
-/// @param model_file_name наименование файла модели
-/// @return 1 - ok 0 - error
-int parsingDataSize(data_t *data, char *model_file_name) {
-  int flag = 1;
-  FILE *f;
-  char string_file[size] = {'\0'};
-  if ((f = fopen(model_file_name, "r")) != NULL) {
-    while (fgets(string_file, size, f)) {
-      if (parsingСonditions('v', string_file, NULL)) {
-        data->count_of_vertexes++;
-      } else if (parsingСonditions('f', string_file, NULL)) {
-        data->count_of_facets++;
-      }
-      string_file[0] = 0;
-    }
-  } else {
-    flag = 0;
-  }
-  return flag;
-}
-
-/// @brief Соответсвие условиям парсинга
-/// @param c тип данных obj файла
-/// @param string_file строка obj файла
-/// @return 1 - ok 0 - error
-int parsingСonditions(char c, char *string_file, int *step) {
-  int flag = 0;
-  int s = 0;
-  s21_skip_space(string_file, &s);
-  if (string_file[s] == c) {
-    if (string_file[s + 1] == ' ') {
-      flag = 1;
-    }
-  }
-  step ? *step = s + 2 : 0;
-  return flag;
-}
-
 /// @brief Пропуск пробелов
 /// @param str Стартовая строка
 /// @param step Количество пробелов
@@ -213,4 +205,13 @@ int s21_is_space(char c) {
     flag = 1;
   }
   return flag;
+}
+
+void printf_matrix(matrix_t matrix) {
+  for (int i = 0; i < matrix.rows; i++) {
+    for (int j = 0; j < matrix.cols; j++) {
+      printf("%lf ", matrix.matrix[i][j]);
+    }
+    printf("\n");
+  }
 }
