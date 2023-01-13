@@ -11,9 +11,10 @@ int main() {
   }
   printf("count_of_vertexes = %d\n", data.count_of_vertexes);
   printf("count_of_facets = %d\n", data.count_of_facets);
-  // printf_matrix(data.matrix_3d);
-  // printf_polygons(data);
-  // s21_remove_matrix(&data.matrix_3d);
+  printf_matrix(data.matrix_3d);
+  printf_polygons(data);
+  s21_remove_matrix(&data.matrix_3d);
+  s21_remove_polygons(data);
   return 0;
 }
 
@@ -28,15 +29,12 @@ int s21_parsing(data_t *data, char *model_file_name) {
   int row = 1;
   matrix_t mat = {0};
   polygon_t *polygon =
-      (polygon_t *)malloc((data->count_of_facets + 1) * sizeof(polygon_t));
+      (polygon_t *)calloc((data->count_of_facets + 1), sizeof(polygon_t));
   int polygonsCounter = 1;
   if (polygon == NULL) {
     flag = 0;
   } else if (s21_parsingDataSize(data, model_file_name)) {
     if (s21_create_matrix(data->count_of_vertexes + 1, 3, &mat) == 0) {
-      // printf("ERRORRRRR\n");
-      // printf_matrix(mat);
-
       if ((f = fopen(model_file_name, "r")) != NULL) {
         while (fgets(string_file, size, f)) {
           int step = 0;
@@ -46,10 +44,8 @@ int s21_parsing(data_t *data, char *model_file_name) {
               double num = 0;
               s21_string_to_double(&string_file[step], &s, &num);
               mat.matrix[row][i] = num;
-              printf("%lf ", mat.matrix[row][i]);
               step += s;
             }
-            printf("\n");
             row++;
           } else if (s21_parsingСonditions('f', string_file, 0)) {
             s21_findPolygons(&polygon[polygonsCounter], string_file);
@@ -61,10 +57,8 @@ int s21_parsing(data_t *data, char *model_file_name) {
       } else {
         flag = 0;
       }
-      // printf("\n");
-      printf_matrix(mat);
-      // data->matrix_3d = mat;
-      // data->polygons = polygon;
+      data->matrix_3d = mat;
+      data->polygons = polygon;
     } else {
       flag = 0;
     }
@@ -75,45 +69,52 @@ int s21_parsing(data_t *data, char *model_file_name) {
 }
 
 /// @brief Парсит полигоны
-/// @param polygons структура полиговнов
+/// @param polygons структура полигонов
 /// @param string_file строка файла модели
 void s21_findPolygons(polygon_t *polygons, char *string_file) {
   int step = 0;
   int i = 0;
-  polygons->vertexes = (int *)malloc(size * sizeof(int));
-  polygons->numbers_of_vertexes_in_facets = 0;
+  polygons = (polygon_t *)calloc((20), sizeof(polygon_t));
+  polygons->vertexes = (int *)calloc((20), sizeof(int));
+  int num_of_ver = 0;
   while (step < (int)strlen(string_file)) {
     int s = 0;
     double num = 0;
-    s21_string_to_double(&string_file[step], &s, &num);
-    step += s;
-    if (string_file[step - s21_num_digits((int)num) - 1] == ' ') {
-      if (polygons->numbers_of_vertexes_in_facets != 0) {
+    if (s21_string_to_double(&string_file[step], &s, &num)) {
+      step += s;
+      printf("---------------\n");
+      printf("step = %d\n", step);
+      printf("s21_num_digits((int)num) = %d\n", s21_num_digits((int)num));
+      printf("step in findPolygons = %d\n",
+             (step - s21_num_digits((int)num) - 1));
+      printf("---------------\n");
+
+      if (string_file[step - s21_num_digits((int)num) - 1] == ' ') {
+        if (num_of_ver != 0) {
+          polygons->vertexes[i++] = (int)num;
+        }
         polygons->vertexes[i++] = (int)num;
+        num_of_ver++;
       }
-      polygons->vertexes[i++] = (int)num;
-      polygons->numbers_of_vertexes_in_facets++;
     }
     step++;
   }
-  if (polygons->numbers_of_vertexes_in_facets > 1) {
+  if (num_of_ver > 1) {
     polygons->vertexes[i++] = polygons->vertexes[0];
   }
+  polygons->numbers_of_vertexes_in_facets = num_of_ver;
 }
 
-void printf_polygons(data_t data) {
-  for (int i = 0; i < data.count_of_facets; i++) {
-    for (int j = 0; j < data.polygons[i].numbers_of_vertexes_in_facets * 2;
-         j++) {
-      printf("%d ", data.polygons[i].vertexes[j]);
+void s21_remove_polygons(data_t data) {
+  if (data.polygons != NULL) {
+    for (int i = 0; i < data.count_of_facets; i++) {
+      if (data.polygons[i].vertexes != NULL) {
+        free(data.polygons[i].vertexes);
+      }
     }
-    printf("\n");
+    free(data.polygons);
   }
 }
-
-// void s21_remove_polygons(polygon_t *polygons) {
-
-// }
 
 /// @brief Количество цифр в числе
 /// @param num искомое число
@@ -295,6 +296,16 @@ void printf_matrix(matrix_t matrix) {
       printf("%lf ", matrix.matrix[i][j]);
     }
 
+    printf("\n");
+  }
+}
+
+void printf_polygons(data_t data) {
+  for (int i = 0; i < data.count_of_facets; i++) {
+    for (int j = 0; j < data.polygons[i].numbers_of_vertexes_in_facets * 2;
+         j++) {
+      printf("%d ", data.polygons[i].vertexes[j]);
+    }
     printf("\n");
   }
 }

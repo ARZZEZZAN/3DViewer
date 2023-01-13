@@ -33,8 +33,8 @@ int s21_create_matrix(int rows, int columns, matrix_t *result);
 void s21_remove_matrix(matrix_t *A);
 
 void s21_findPolygons(polygon_t *polygons, char *string_file);
+void s21_remove_polygons(data_t data);
 int s21_num_digits(int num);
-void s21_remove_polygons(polygon_t *polygons);
 
 int s21_string_to_double(char *str, int *step, double *number);
 int s21_is_digit(char c);
