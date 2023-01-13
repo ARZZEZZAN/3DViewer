@@ -2,46 +2,60 @@
 
 int main() {
   data_t data = {0};
-  matrix_t matrix = {0};
   char model_file_name[size] = "./objFiles/cube.obj";
 
-  if (parsingData(&data, &matrix, model_file_name)) {
+  if (s21_parsing(&data, model_file_name)) {
     printf("ok\n");
   } else {
     printf("error\n");
   }
   printf("count_of_vertexes = %d\n", data.count_of_vertexes);
   printf("count_of_facets = %d\n", data.count_of_facets);
-  printf_matrix(matrix);
-  s21_remove_matrix(&matrix);
+  printf_matrix(data.matrix_3d);
+  printf_polygons(data);
   return 0;
 }
 
-int parsingData(data_t *data, matrix_t *matrix, char *model_file_name) {
+/// @brief Основной метод парсинга
+/// @param data структура с количеством вершин и полигонов
+/// @param model_file_name имя файла модели
+/// @return 1 - ok 0 - error
+int s21_parsing(data_t *data, char *model_file_name) {
   int flag = 1;
   char string_file[size] = {'\0'};
   FILE *f;
   int row = 1;
-  if (parsingDataSize(data, model_file_name)) {
-    if (s21_create_matrix(++data->count_of_vertexes, 3, matrix) == 0) {
+  matrix_t matrix = {0};
+  polygon_t *polygon =
+      (polygon_t *)malloc((data->count_of_facets + 1) * sizeof(polygon_t));
+  int polygonsCounter = 1;
+  if (polygon == NULL) {
+    flag = 0;
+  } else if (s21_parsingDataSize(data, model_file_name)) {
+    if (s21_create_matrix(data->count_of_vertexes + 1, 3, &matrix) == 0) {
       if ((f = fopen(model_file_name, "r")) != NULL) {
         while (fgets(string_file, size, f)) {
           int step = 0;
-          if (parsingСonditions('v', string_file, &step)) {
+          if (s21_parsingСonditions('v', string_file, &step)) {
             for (int i = 0; i < 3; i++) {
               int s = 0;
               double num = 0;
               s21_string_to_double(&string_file[step], &s, &num);
-              matrix->matrix[row][i] = num;
+              matrix.matrix[row][i] = num;
               step += s;
             }
             row++;
+          } else if (s21_parsingСonditions('f', string_file, &step)) {
+            s21_findPolygons(&polygon[polygonsCounter], string_file);
+            polygonsCounter++;
           }
           string_file[0] = 0;
         }
       } else {
         flag = 0;
       }
+      data->matrix_3d = matrix;
+      data->polygons = polygon;
     } else {
       flag = 0;
     }
@@ -51,19 +65,78 @@ int parsingData(data_t *data, matrix_t *matrix, char *model_file_name) {
   return flag;
 }
 
+/// @brief Парсит полигоны
+/// @param polygons структура полиговнов
+/// @param string_file строка файла модели
+void s21_findPolygons(polygon_t *polygons, char *string_file) {
+  int step = 0;
+  int i = 0;
+  polygons->vertexes = (int *)malloc(size * sizeof(int));
+  polygons->numbers_of_vertexes_in_facets = 0;
+  while (step < (int)strlen(string_file)) {
+    int s = 0;
+    double num = 0;
+    s21_string_to_double(&string_file[step], &s, &num);
+    step += s;
+    if (string_file[step - s21_num_digits((int)num) - 1] == ' ') {
+      if (polygons->numbers_of_vertexes_in_facets != 0) {
+        polygons->vertexes[i++] = (int)num;
+      }
+      polygons->vertexes[i++] = (int)num;
+      polygons->numbers_of_vertexes_in_facets++;
+    }
+    step++;
+  }
+  if (polygons->numbers_of_vertexes_in_facets > 1) {
+    polygons->vertexes[i++] = polygons->vertexes[0];
+  }
+}
+
+void printf_polygons(data_t data) {
+  for (int i = 0; i < data.count_of_facets; i++) {
+    for (int j = 0; j < data.polygons[i].numbers_of_vertexes_in_facets * 2;
+         j++) {
+      printf("%d ", data.polygons[i].vertexes[j]);
+    }
+    printf("\n");
+  }
+}
+
+// void s21_remove_polygons(polygon_t *polygons) {
+
+// }
+
+/// @brief Количество цифр в числе
+/// @param num искомое число
+/// @return Возвращает количество цифр в числе
+int s21_num_digits(int num) {
+  int count = 0;
+  if (num == 0) {
+    count = 1;
+  } else if (num < 0) {
+    count++;
+    num = -num;
+  }
+  while (num > 0) {
+    count++;
+    num /= 10;
+  }
+  return count;
+}
+
 /// @brief Парсинг количества вершин и полигонов
 /// @param data структура данных
 /// @param model_file_name наименование файла модели
 /// @return 1 - ok 0 - error
-int parsingDataSize(data_t *data, char *model_file_name) {
+int s21_parsingDataSize(data_t *data, char *model_file_name) {
   int flag = 1;
   FILE *f;
   char string_file[size] = {'\0'};
   if ((f = fopen(model_file_name, "r")) != NULL) {
     while (fgets(string_file, size, f)) {
-      if (parsingСonditions('v', string_file, NULL)) {
+      if (s21_parsingСonditions('v', string_file, NULL)) {
         data->count_of_vertexes++;
-      } else if (parsingСonditions('f', string_file, NULL)) {
+      } else if (s21_parsingСonditions('f', string_file, NULL)) {
         data->count_of_facets++;
       }
       string_file[0] = 0;
@@ -78,7 +151,7 @@ int parsingDataSize(data_t *data, char *model_file_name) {
 /// @param c тип данных obj файла
 /// @param string_file строка obj файла
 /// @return 1 - ok 0 - error
-int parsingСonditions(char c, char *string_file, int *step) {
+int s21_parsingСonditions(char c, char *string_file, int *step) {
   int flag = 0;
   int s = 0;
   s21_skip_space(string_file, &s);
@@ -208,8 +281,11 @@ int s21_is_space(char c) {
 }
 
 void printf_matrix(matrix_t matrix) {
+  // printf("matrix.rows = %d\n", matrix.rows);
+  // printf("matrix.cols = %d\n", matrix.cols);
   for (int i = 0; i < matrix.rows; i++) {
     for (int j = 0; j < matrix.cols; j++) {
+      // printf("------------ERROR--------------\n");
       printf("%lf ", matrix.matrix[i][j]);
     }
     printf("\n");

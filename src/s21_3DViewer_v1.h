@@ -25,12 +25,16 @@ typedef struct data {
   polygon_t *polygons;
 } data_t;
 
-int parsingData(data_t *data, matrix_t *matrix, char *model_file_name);
-int parsingDataSize(data_t *data, char *model_file_name);
-int parsingСonditions(char c, char *string_file, int *step);
+int s21_parsing(data_t *data, char *model_file_name);
+int s21_parsingDataSize(data_t *data, char *model_file_name);
+int s21_parsingСonditions(char c, char *string_file, int *step);
 
 int s21_create_matrix(int rows, int columns, matrix_t *result);
 void s21_remove_matrix(matrix_t *A);
+
+void s21_findPolygons(polygon_t *polygons, char *string_file);
+int s21_num_digits(int num);
+void s21_remove_polygons(polygon_t *polygons);
 
 int s21_string_to_double(char *str, int *step, double *number);
 int s21_is_digit(char c);
@@ -39,5 +43,6 @@ int s21_skip_space(char *str, int *step);
 int s21_is_space(char c);
 
 void printf_matrix(matrix_t matrix);
+void printf_polygons(data_t data);
 
 #endif
