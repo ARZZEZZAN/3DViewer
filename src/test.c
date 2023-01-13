@@ -1,3 +1,11 @@
+#include "s21_3DViewer_v1.h"
+int main() {
+  matrix_t matrix = {0};
+  if (s21_create_matrix(5, 5, &matrix) == 0) {
+    printf_matrix(matrix);
+  }
+  return 0;
+}
 /*
 // test1
 data_t data = {0};

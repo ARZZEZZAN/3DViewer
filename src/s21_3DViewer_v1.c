@@ -11,8 +11,9 @@ int main() {
   }
   printf("count_of_vertexes = %d\n", data.count_of_vertexes);
   printf("count_of_facets = %d\n", data.count_of_facets);
-  printf_matrix(data.matrix_3d);
-  printf_polygons(data);
+  // printf_matrix(data.matrix_3d);
+  // printf_polygons(data);
+  // s21_remove_matrix(&data.matrix_3d);
   return 0;
 }
 
@@ -25,14 +26,17 @@ int s21_parsing(data_t *data, char *model_file_name) {
   char string_file[size] = {'\0'};
   FILE *f;
   int row = 1;
-  matrix_t matrix = {0};
+  matrix_t mat = {0};
   polygon_t *polygon =
       (polygon_t *)malloc((data->count_of_facets + 1) * sizeof(polygon_t));
   int polygonsCounter = 1;
   if (polygon == NULL) {
     flag = 0;
   } else if (s21_parsingDataSize(data, model_file_name)) {
-    if (s21_create_matrix(data->count_of_vertexes + 1, 3, &matrix) == 0) {
+    if (s21_create_matrix(data->count_of_vertexes + 1, 3, &mat) == 0) {
+      // printf("ERRORRRRR\n");
+      // printf_matrix(mat);
+
       if ((f = fopen(model_file_name, "r")) != NULL) {
         while (fgets(string_file, size, f)) {
           int step = 0;
@@ -41,21 +45,26 @@ int s21_parsing(data_t *data, char *model_file_name) {
               int s = 0;
               double num = 0;
               s21_string_to_double(&string_file[step], &s, &num);
-              matrix.matrix[row][i] = num;
+              mat.matrix[row][i] = num;
+              printf("%lf ", mat.matrix[row][i]);
               step += s;
             }
+            printf("\n");
             row++;
-          } else if (s21_parsingСonditions('f', string_file, &step)) {
+          } else if (s21_parsingСonditions('f', string_file, 0)) {
             s21_findPolygons(&polygon[polygonsCounter], string_file);
             polygonsCounter++;
           }
           string_file[0] = 0;
         }
+
       } else {
         flag = 0;
       }
-      data->matrix_3d = matrix;
-      data->polygons = polygon;
+      // printf("\n");
+      printf_matrix(mat);
+      // data->matrix_3d = mat;
+      // data->polygons = polygon;
     } else {
       flag = 0;
     }
@@ -281,13 +290,11 @@ int s21_is_space(char c) {
 }
 
 void printf_matrix(matrix_t matrix) {
-  // printf("matrix.rows = %d\n", matrix.rows);
-  // printf("matrix.cols = %d\n", matrix.cols);
-  for (int i = 0; i < matrix.rows; i++) {
+  for (int i = 1; i < matrix.rows; i++) {
     for (int j = 0; j < matrix.cols; j++) {
-      // printf("------------ERROR--------------\n");
       printf("%lf ", matrix.matrix[i][j]);
     }
+
     printf("\n");
   }
 }
