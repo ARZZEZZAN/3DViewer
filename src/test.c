@@ -1,9 +1,10 @@
 #include "s21_3DViewer_v1.h"
 int main() {
-  matrix_t matrix = {0};
-  if (s21_create_matrix(5, 5, &matrix) == 0) {
-    printf_matrix(matrix);
-  }
+  int s_size = 10;
+  polygon_t *polygon = (polygon_t *)calloc((s_size), sizeof(polygon_t));
+  polygon[0].numbers_of_vertexes_in_facets = 0;
+  printf("polygon[0].numbers_of_vertexes_in_facets = %d\n",
+         polygon[0].numbers_of_vertexes_in_facets);
   return 0;
 }
 /*

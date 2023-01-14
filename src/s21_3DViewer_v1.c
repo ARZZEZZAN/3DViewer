@@ -28,37 +28,39 @@ int s21_parsing(data_t *data, char *model_file_name) {
   FILE *f;
   int row = 1;
   matrix_t mat = {0};
-  polygon_t *polygon =
-      (polygon_t *)calloc((data->count_of_facets + 1), sizeof(polygon_t));
   int polygonsCounter = 1;
-  if (polygon == NULL) {
-    flag = 0;
-  } else if (s21_parsingDataSize(data, model_file_name)) {
-    if (s21_create_matrix(data->count_of_vertexes + 1, 3, &mat) == 0) {
-      if ((f = fopen(model_file_name, "r")) != NULL) {
-        while (fgets(string_file, size, f)) {
-          int step = 0;
-          if (s21_parsingСonditions('v', string_file, &step)) {
-            for (int i = 0; i < 3; i++) {
-              int s = 0;
-              double num = 0;
-              s21_string_to_double(&string_file[step], &s, &num);
-              mat.matrix[row][i] = num;
-              step += s;
+  if (s21_parsingDataSize(data, model_file_name)) {
+    polygon_t *polygon =
+        (polygon_t *)calloc((data->count_of_facets + 1), sizeof(polygon_t));
+    if (polygon != NULL) {
+      if (s21_create_matrix(data->count_of_vertexes + 1, 3, &mat) == 0) {
+        if ((f = fopen(model_file_name, "r")) != NULL) {
+          while (fgets(string_file, size, f)) {
+            int step = 0;
+            if (s21_parsingСonditions('v', string_file, &step)) {
+              for (int i = 0; i < 3; i++) {
+                int s = 0;
+                double num = 0;
+                s21_string_to_double(&string_file[step], &s, &num);
+                mat.matrix[row][i] = num;
+                step += s;
+              }
+              row++;
+            } else if (s21_parsingСonditions('f', string_file, 0)) {
+              s21_findPolygons(&polygon[polygonsCounter], string_file);
+              polygonsCounter++;
             }
-            row++;
-          } else if (s21_parsingСonditions('f', string_file, 0)) {
-            s21_findPolygons(&polygon[polygonsCounter], string_file);
-            polygonsCounter++;
+            string_file[0] = 0;
           }
-          string_file[0] = 0;
-        }
 
+        } else {
+          flag = 0;
+        }
+        data->matrix_3d = mat;
+        data->polygons = polygon;
       } else {
         flag = 0;
       }
-      data->matrix_3d = mat;
-      data->polygons = polygon;
     } else {
       flag = 0;
     }
@@ -74,7 +76,6 @@ int s21_parsing(data_t *data, char *model_file_name) {
 void s21_findPolygons(polygon_t *polygons, char *string_file) {
   int step = 0;
   int i = 0;
-  polygons = (polygon_t *)calloc((20), sizeof(polygon_t));
   polygons->vertexes = (int *)calloc((20), sizeof(int));
   int num_of_ver = 0;
   while (step < (int)strlen(string_file)) {
@@ -82,13 +83,6 @@ void s21_findPolygons(polygon_t *polygons, char *string_file) {
     double num = 0;
     if (s21_string_to_double(&string_file[step], &s, &num)) {
       step += s;
-      printf("---------------\n");
-      printf("step = %d\n", step);
-      printf("s21_num_digits((int)num) = %d\n", s21_num_digits((int)num));
-      printf("step in findPolygons = %d\n",
-             (step - s21_num_digits((int)num) - 1));
-      printf("---------------\n");
-
       if (string_file[step - s21_num_digits((int)num) - 1] == ' ') {
         if (num_of_ver != 0) {
           polygons->vertexes[i++] = (int)num;
@@ -291,6 +285,7 @@ int s21_is_space(char c) {
 }
 
 void printf_matrix(matrix_t matrix) {
+  printf("matrix:\n");
   for (int i = 1; i < matrix.rows; i++) {
     for (int j = 0; j < matrix.cols; j++) {
       printf("%lf ", matrix.matrix[i][j]);
@@ -301,7 +296,8 @@ void printf_matrix(matrix_t matrix) {
 }
 
 void printf_polygons(data_t data) {
-  for (int i = 0; i < data.count_of_facets; i++) {
+  printf("polygons:\n");
+  for (int i = 0; i <= data.count_of_facets; i++) {
     for (int j = 0; j < data.polygons[i].numbers_of_vertexes_in_facets * 2;
          j++) {
       printf("%d ", data.polygons[i].vertexes[j]);
