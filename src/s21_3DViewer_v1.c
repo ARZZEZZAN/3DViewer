@@ -1,23 +1,5 @@
 #include "s21_3DViewer_v1.h"
 
-int main() {
-  data_t data = {0};
-  char model_file_name[size] = "./objFiles/cube.obj";
-
-  if (s21_parsing(&data, model_file_name)) {
-    printf("ok\n");
-  } else {
-    printf("error\n");
-  }
-  printf("count_of_vertexes = %d\n", data.count_of_vertexes);
-  printf("count_of_facets = %d\n", data.count_of_facets);
-  printf_matrix(data.matrix_3d);
-  printf_polygons(data);
-  s21_remove_matrix(&data.matrix_3d);
-  s21_remove_polygons(data);
-  return 0;
-}
-
 /// @brief Основной метод парсинга
 /// @param data структура с количеством вершин и полигонов
 /// @param model_file_name имя файла модели
@@ -28,10 +10,10 @@ int s21_parsing(data_t *data, char *model_file_name) {
   FILE *f;
   int row = 1;
   matrix_t mat = {0};
-  int polygonsCounter = 1;
+  int polygonsCounter = 0;
   if (s21_parsingDataSize(data, model_file_name)) {
     polygon_t *polygon =
-        (polygon_t *)calloc((data->count_of_facets + 1), sizeof(polygon_t));
+        (polygon_t *)calloc((data->count_of_facets), sizeof(polygon_t));
     if (polygon != NULL) {
       if (s21_create_matrix(data->count_of_vertexes + 1, 3, &mat) == 0) {
         if ((f = fopen(model_file_name, "r")) != NULL) {
@@ -68,64 +50,6 @@ int s21_parsing(data_t *data, char *model_file_name) {
     flag = 0;
   }
   return flag;
-}
-
-/// @brief Парсит полигоны
-/// @param polygons структура полигонов
-/// @param string_file строка файла модели
-void s21_findPolygons(polygon_t *polygons, char *string_file) {
-  int step = 0;
-  int i = 0;
-  polygons->vertexes = (int *)calloc((20), sizeof(int));
-  int num_of_ver = 0;
-  while (step < (int)strlen(string_file)) {
-    int s = 0;
-    double num = 0;
-    if (s21_string_to_double(&string_file[step], &s, &num)) {
-      step += s;
-      if (string_file[step - s21_num_digits((int)num) - 1] == ' ') {
-        if (num_of_ver != 0) {
-          polygons->vertexes[i++] = (int)num;
-        }
-        polygons->vertexes[i++] = (int)num;
-        num_of_ver++;
-      }
-    }
-    step++;
-  }
-  if (num_of_ver > 1) {
-    polygons->vertexes[i++] = polygons->vertexes[0];
-  }
-  polygons->numbers_of_vertexes_in_facets = num_of_ver;
-}
-
-void s21_remove_polygons(data_t data) {
-  if (data.polygons != NULL) {
-    for (int i = 0; i < data.count_of_facets; i++) {
-      if (data.polygons[i].vertexes != NULL) {
-        free(data.polygons[i].vertexes);
-      }
-    }
-    free(data.polygons);
-  }
-}
-
-/// @brief Количество цифр в числе
-/// @param num искомое число
-/// @return Возвращает количество цифр в числе
-int s21_num_digits(int num) {
-  int count = 0;
-  if (num == 0) {
-    count = 1;
-  } else if (num < 0) {
-    count++;
-    num = -num;
-  }
-  while (num > 0) {
-    count++;
-    num /= 10;
-  }
-  return count;
 }
 
 /// @brief Парсинг количества вершин и полигонов
@@ -166,6 +90,47 @@ int s21_parsingСonditions(char c, char *string_file, int *step) {
   }
   step ? *step = s + 2 : 0;
   return flag;
+}
+
+/// @brief Парсит полигоны
+/// @param polygons структура полигонов
+/// @param string_file строка файла модели
+void s21_findPolygons(polygon_t *polygons, char *string_file) {
+  int step = 0;
+  int i = 0;
+  polygons->vertexes = (int *)calloc((20), sizeof(int));
+  polygons->numbers_of_vertexes_in_facets = 0;
+  while (step < (int)strlen(string_file)) {
+    int s = 0;
+    double num = 0;
+    if (s21_string_to_double(&string_file[step], &s, &num)) {
+      step += s;
+      if (string_file[step - s21_num_digits((int)num) - 1] == ' ') {
+        if (polygons->numbers_of_vertexes_in_facets != 0) {
+          polygons->vertexes[i++] = (int)num;
+        }
+        polygons->vertexes[i++] = (int)num;
+        polygons->numbers_of_vertexes_in_facets++;
+      }
+    }
+    step++;
+  }
+  if (polygons->numbers_of_vertexes_in_facets > 1) {
+    polygons->vertexes[i++] = polygons->vertexes[0];
+  }
+}
+
+/// @brief Удаление полигонов, освобождение памяти
+/// @param data
+void s21_remove_polygons(data_t data) {
+  if (data.polygons != NULL) {
+    for (int i = 0; i < data.count_of_facets; i++) {
+      if (data.polygons[i].vertexes != NULL) {
+        free(data.polygons[i].vertexes);
+      }
+    }
+    free(data.polygons);
+  }
 }
 
 /// @brief Создание матриц
@@ -247,17 +212,6 @@ int s21_string_to_double(char *str, int *step, double *number) {
   return flag;
 }
 
-/// @brief Поиск цифры
-/// @param c
-/// @return 0 - если не цифра 1 - если цифра
-int s21_is_digit(char c) {
-  int flag = 0;
-  if (c >= '0' && c <= '9') {
-    flag = 1;
-  }
-  return flag;
-}
-
 /// @brief Пропуск пробелов
 /// @param str Стартовая строка
 /// @param step Количество пробелов
@@ -284,24 +238,31 @@ int s21_is_space(char c) {
   return flag;
 }
 
-void printf_matrix(matrix_t matrix) {
-  printf("matrix:\n");
-  for (int i = 1; i < matrix.rows; i++) {
-    for (int j = 0; j < matrix.cols; j++) {
-      printf("%lf ", matrix.matrix[i][j]);
-    }
-
-    printf("\n");
+/// @brief Количество цифр в числе
+/// @param num искомое число
+/// @return Возвращает количество цифр в числе
+int s21_num_digits(int num) {
+  int count = 0;
+  if (num == 0) {
+    count = 1;
+  } else if (num < 0) {
+    count++;
+    num = -num;
   }
+  while (num > 0) {
+    count++;
+    num /= 10;
+  }
+  return count;
 }
 
-void printf_polygons(data_t data) {
-  printf("polygons:\n");
-  for (int i = 0; i <= data.count_of_facets; i++) {
-    for (int j = 0; j < data.polygons[i].numbers_of_vertexes_in_facets * 2;
-         j++) {
-      printf("%d ", data.polygons[i].vertexes[j]);
-    }
-    printf("\n");
+/// @brief Поиск цифры
+/// @param c
+/// @return 0 - если не цифра 1 - если цифра
+int s21_is_digit(char c) {
+  int flag = 0;
+  if (c >= '0' && c <= '9') {
+    flag = 1;
   }
+  return flag;
 }
