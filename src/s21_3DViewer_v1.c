@@ -6,7 +6,7 @@
 /// @return 1 - ok 0 - error
 int s21_parsing(data_t *data, char *model_file_name) {
   int flag = 1;
-  char string_file[size] = {'\0'};
+  char string_file[S_SIZE] = {'\0'};
   FILE *f;
   int row = 1;
   matrix_t mat = {0};
@@ -17,7 +17,7 @@ int s21_parsing(data_t *data, char *model_file_name) {
     if (polygon != NULL) {
       if (s21_create_matrix(data->count_of_vertexes + 1, 3, &mat) == 0) {
         if ((f = fopen(model_file_name, "r")) != NULL) {
-          while (fgets(string_file, size, f)) {
+          while (fgets(string_file, S_SIZE, f)) {
             int step = 0;
             if (s21_parsingСonditions('v', string_file, &step)) {
               for (int i = 0; i < 3; i++) {
@@ -49,6 +49,14 @@ int s21_parsing(data_t *data, char *model_file_name) {
   } else {
     flag = 0;
   }
+  double *massiv =
+      (double *)calloc((data->count_of_vertexes + 1) * 3, sizeof(double));
+  if (massiv != NULL) {
+    s21_matrix_to_massiv(data->matrix_3d, massiv);
+    data->massiv = massiv;
+  } else {
+    flag = 0;
+  }
   return flag;
 }
 
@@ -59,9 +67,9 @@ int s21_parsing(data_t *data, char *model_file_name) {
 int s21_parsingDataSize(data_t *data, char *model_file_name) {
   int flag = 1;
   FILE *f;
-  char string_file[size] = {'\0'};
+  char string_file[S_SIZE] = {'\0'};
   if ((f = fopen(model_file_name, "r")) != NULL) {
-    while (fgets(string_file, size, f)) {
+    while (fgets(string_file, S_SIZE, f)) {
       if (s21_parsingСonditions('v', string_file, NULL)) {
         data->count_of_vertexes++;
       } else if (s21_parsingСonditions('f', string_file, NULL)) {
@@ -90,6 +98,16 @@ int s21_parsingСonditions(char c, char *string_file, int *step) {
   }
   step ? *step = s + 2 : 0;
   return flag;
+}
+
+/// @brief Освобождение памяти структуры data
+/// @param data
+void s21_remove_data(data_t *data) {
+  s21_remove_massiv(data);
+  s21_remove_matrix(&data->matrix_3d);
+  s21_remove_polygons(data);
+  data->count_of_facets = 0;
+  data->count_of_vertexes = 0;
 }
 
 /// @brief Парсит полигоны
@@ -122,14 +140,14 @@ void s21_findPolygons(polygon_t *polygons, char *string_file) {
 
 /// @brief Удаление полигонов, освобождение памяти
 /// @param data
-void s21_remove_polygons(data_t data) {
-  if (data.polygons != NULL) {
-    for (int i = 0; i < data.count_of_facets; i++) {
-      if (data.polygons[i].vertexes != NULL) {
-        free(data.polygons[i].vertexes);
+void s21_remove_polygons(data_t *data) {
+  if (data->polygons != NULL) {
+    for (int i = 0; i < data->count_of_facets; i++) {
+      if (data->polygons[i].vertexes != NULL) {
+        free(data->polygons[i].vertexes);
       }
     }
-    free(data.polygons);
+    free(data->polygons);
   }
 }
 
@@ -208,8 +226,84 @@ int s21_string_to_double(char *str, int *step, double *number) {
     }
   }
   *step = i;
+  if (s21_Euler_search(&str[i], &i, &num)) {
+    *step = i;
+  }
   *number = num * neg;
   return flag;
+}
+
+/// @brief Находит число Эйлера
+/// @param str строка чисел
+/// @param step шаг
+/// @param num число
+/// @return 1 - ok 0 - error
+int s21_Euler_search(char *str, int *step, double *num) {
+  int e = 0;
+  int negative = 1;
+  int flag = 1;
+  int i = 0;
+  if (str[i] == 'e' || str[i] == 'E') {
+    i++;
+    if (str[i] && str[i] == '-') {
+      negative = -1;
+      i++;
+    } else if (str[i] && str[i] == '+') {
+      negative = 1;
+      i++;
+    }
+    if (str[i] && s21_is_digit(str[i]) == 1) {
+      e = (e * 10) + (int)(str[i] - '0');
+      i++;
+    } else {
+      flag = 0;
+    }
+    if (str[i] && s21_is_digit(str[i]) == 1) {
+      e = (e * 10) + (int)(str[i] - '0');
+    }
+  } else {
+    flag = 0;
+  }
+  double ten = 10;
+  if (flag == 1) {
+    if (negative == -1) {
+      ten = 0.1;
+    }
+    for (int i = 0; i < e; i++) {
+      *num *= ten;
+    }
+  }
+  *step = i;
+
+  return flag;
+}
+
+/// @brief Перевод из матрицы в массив
+/// @param matrix
+/// @param massiv
+/// @return 1 - ok 0 - error
+int s21_matrix_to_massiv(matrix_t matrix, double *massiv) {
+  int flag = 1;
+  int massivSize = 0;
+  if (massiv != NULL) {
+    for (int i = 0; i < matrix.rows; i++) {
+      for (int j = 0; j < matrix.cols; j++) {
+        massiv[massivSize] = matrix.matrix[i][j];
+        massivSize++;
+      }
+    }
+  } else {
+    flag = 0;
+  }
+  return flag;
+}
+
+/// @brief Удаление полигонов, освобождение памяти
+/// @param data
+void s21_remove_massiv(data_t *data) {
+  if (data->massiv != NULL) {
+    free(data->massiv);
+  }
 }
 
 /// @brief Пропуск пробелов
