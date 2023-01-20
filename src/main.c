@@ -5,7 +5,7 @@ void printf_massiv(data_t data);
 void max_min_dot(data_t data);
 int main() {
   data_t data = {0};
-  char model_file_name[S_SIZE] = "./objFiles/Dany.obj";
+  char model_file_name[S_SIZE] = "./objFiles/2.objj";
 
   if (s21_parsing(&data, model_file_name)) {
     // printf("dot: %d\n", data.count_of_vertexes);

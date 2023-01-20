@@ -11,35 +11,39 @@ int s21_parsing(data_t *data, char *model_file_name) {
   int row = 1;
   matrix_t mat = {0};
   int polygonsCounter = 0;
-  if (s21_parsingDataSize(data, model_file_name)) {
-    polygon_t *polygon =
-        (polygon_t *)calloc((data->count_of_facets), sizeof(polygon_t));
-    if (polygon != NULL) {
-      if (s21_create_matrix(data->count_of_vertexes + 1, 3, &mat) == 0) {
-        if ((f = fopen(model_file_name, "r")) != NULL) {
-          while (fgets(string_file, S_SIZE, f)) {
-            int step = 0;
-            if (s21_parsingСonditions('v', string_file, &step)) {
-              for (int i = 0; i < 3; i++) {
-                int s = 0;
-                double num = 0;
-                s21_string_to_double(&string_file[step], &s, &num);
-                mat.matrix[row][i] = num;
-                step += s;
+  if (s21_endsWithObj(model_file_name)) {
+    if (s21_parsingDataSize(data, model_file_name)) {
+      polygon_t *polygon =
+          (polygon_t *)calloc((data->count_of_facets), sizeof(polygon_t));
+      if (polygon != NULL) {
+        if (s21_create_matrix(data->count_of_vertexes + 1, 3, &mat) == 0) {
+          if ((f = fopen(model_file_name, "r")) != NULL) {
+            while (fgets(string_file, S_SIZE, f)) {
+              int step = 0;
+              if (s21_parsingСonditions('v', string_file, &step)) {
+                for (int i = 0; i < 3; i++) {
+                  int s = 0;
+                  double num = 0;
+                  s21_string_to_double(&string_file[step], &s, &num);
+                  mat.matrix[row][i] = num;
+                  step += s;
+                }
+                row++;
+              } else if (s21_parsingСonditions('f', string_file, 0)) {
+                s21_findPolygons(&polygon[polygonsCounter], string_file);
+                polygonsCounter++;
               }
-              row++;
-            } else if (s21_parsingСonditions('f', string_file, 0)) {
-              s21_findPolygons(&polygon[polygonsCounter], string_file);
-              polygonsCounter++;
+              string_file[0] = 0;
             }
-            string_file[0] = 0;
-          }
 
+          } else {
+            flag = 0;
+          }
+          data->matrix_3d = mat;
+          data->polygons = polygon;
         } else {
           flag = 0;
         }
-        data->matrix_3d = mat;
-        data->polygons = polygon;
       } else {
         flag = 0;
       }
@@ -97,6 +101,23 @@ int s21_parsingСonditions(char c, char *string_file, int *step) {
     }
   }
   step ? *step = s + 2 : 0;
+  return flag;
+}
+
+/// @brief Проверка на расширение файла .obj
+/// @param str строка
+/// @return 1 - ok 0 - error
+int s21_endsWithObj(char *str) {
+  int flag = 0;
+  char suffix[4] = ".obj";
+  int lensuf = (int)strlen(suffix);
+  int lenstr = (int)strlen(str);
+  if (str && lenstr > lensuf) {
+    if (strncmp(str + lenstr - lensuf, suffix, lensuf) == 0) {
+      flag = 1;
+    } else {
+    }
+  }
   return flag;
 }
 
