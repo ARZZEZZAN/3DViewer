@@ -49,4 +49,6 @@ int s21_is_space(char c);
 int s21_num_digits(int num);
 int s21_is_digit(char c);
 
+int s21_endsWithObj(char *str);
+
 #endif
