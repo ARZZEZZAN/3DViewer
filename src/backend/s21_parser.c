@@ -381,22 +381,6 @@ void s21_array_minmax(data_t data, double *max_coord) {
   *max_coord *= 1.2f;
 }
 
-/// @brief Проверка на расширение файла .obj
-/// @param str строка
-/// @return 1 - ok 0 - error
-int s21_endsWithObj(char *str) {
-  int flag = 0;
-  char suffix[4] = ".obj";
-  int lensuf = (int)strlen(suffix);
-  int lenstr = (int)strlen(str);
-  if (str && lenstr > lensuf) {
-    if (strncmp(str + lenstr - lensuf, suffix, lensuf) == 0) {
-      flag = 1;
-    }
-  }
-  return flag;
-}
-
 int s21_massivPolygons(data_t *data) {
   int flag = 1;
   for (int i = 0; i < data->count_of_facets; i++) {
