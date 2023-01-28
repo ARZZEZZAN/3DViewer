@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<head>
+  <title>3DViewer_v1.0 manual page</title>
+  <meta charset="utf8">
+
+</head>
+
+<body>
+  <h1 style="text-align:center"><span style="font-size:26px">Инструкция по использованию 3DViewer v1.0</span>
+  </h1>
+
+  <p><span style="font-size:20px">Установка:</span></p>
+  <ol>
+    <li>Вызвать цель
+      <i>make install</i> из папки src.
+    </li>
+    <li>Дождаться установки *.app.</li>
+  </ol>
+
+  <p><span style="font-size:20px">Сборка в архив:</span></p>
+  <ol>
+    <li>Вызвать цель <i>make dist</i> из папки src.</li>
+    <li>Архив собирается в папку <i>src</i>.</li>
+  </ol>
+
+  <p><span style="font-size:20px">Удаление:</span></p>
+  <ol>
+    <li>Вызвать цель <i>make uninstall</i> из папки src.</li>
+    <li>Дождаться удаления&nbsp; *.app.</li>
+  </ol>
+
+  <p><span style="font-size:20px">Запуск и использование:</span></p>
+
+  <ol>
+    <li>Для запуска приложения открыть исполняемый файл open ./build/3DViewer.app/Contents/MacOS/3DViewer, либо через
+      терминал командой &quot;open build/3DViewer.app&quot;</li>
+    <li>Программа загружает файлы в формате *.obj.</li>
+    <li> После загрузки объектного файла доступен весь функционал в графическом интерфейсе, перемещение по осям возможно
+      при
+      помощи соответствующих слайдеров на цифровой панели программы.</li>
+    <li>Для выбора необходимого цветового решения необходимо использовать кнопки "color verticies", "color edges",
+      "Background color". При помощи
+      кнопки &quot;Reset values&quot; можно сбросить настройки пользователя на настройки установленные разработчиками по
+      умолчанию. Для сохранения в формате bmp, jpg, gif, использовать кнопки "bmp", "jpg" и "gif" соответственно.</li>
+  </ol>
+
+  <ul>
+    <li>3DViewer v1.0 поддерживает следующие действия: </li>
+    <ul>
+      <li>Перемещение и вращение: </li>
+      <ol>
+        <li>Перемещение по оси X: <i>"Translate X: от -180 до +180"</i></li>
+        <li>Перемещение по оси Y: <i>"Translate Y: от -180 до +180"</i></li>
+        <li>Перемещение по оси Z:<i>"Translate Z: от -180 до +180"</i></li>
+        <li>Вращение по оси X: <i>"Rotate X: от -180 до +180"</i></li>
+        <li>Вращение по оси Y: <i>"Rotate Y: от -180 до +180"</i></li>
+        <li>Вращение по оси Z: <i>"Rotate Z: от -180 до +180"</i></li>
+        <li>Приближение: <i> "Scale от 1 - до 100"</i></li>
+      </ol>
+      <li>Опции:</li>
+      <ol>
+        <li>Тип проекции: <i>"Central" - центральная, "parallel" - параллельная</i></li>
+        <li>Тип вершин: <i>"Disable" - невидимые, "Circle" - шарообразные , "Square" - квадратные</i></li>
+        <li>Тип граней: <i>"Solid - прямые, "Dashed" - пунктирные</i></li>
+        <li>Толщина граней: <i>"Thickness"</i></li>
+        <li>Цвет вершин: <i>"color verticies"</i></li>
+        <li>Цвет граней: <i>"color edges"</i></li>
+        <li>Цвет заднего фона: <i> "Background color"</i></li>
+        <li>Сброс значений на заводские настройки: <i>"Reset values"</i></li>
+        <li>Сохранение значений в формате: bmp <i>"bmp"</i></li>
+        <li>Сохранение значений в формате: jpg <i>"jpg"</i></li>
+        <li>Сохранение значений в формате: gif <i>"gif"</i></li>
+      </ol>
+    </ul>
+    <br>
+  </ul>
+
+  <p><span style="font-size:14px">Program 3DViewer_v1.0 implemented by DATAN(c).</span></p>
+  <p><span style="font-size:14px">Developers: bernardi, joaquind,
+      stonehom, hazzeasu, killeral. All rights reserved.</span></p>
+</body>
